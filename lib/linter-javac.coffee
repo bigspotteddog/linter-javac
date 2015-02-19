@@ -35,13 +35,16 @@ class LinterJavac extends Linter
   getCmdAndArgs: (filePath) ->
     cmd = @cmd
 
+    @filePath = filePath
+
     # here guarantee `cmd` does not have space or quote mark issue
-    cmd_list = cmd.split(' ').concat [this.editor.buffer.file.path]
+    #cmd_list = cmd.split(' ').concat [this.editor.buffer.file.path]
+    cmd_list = cmd.split(' ').concat [filePath]
 
     if @executablePath
       cmd_list[0] = @executablePath + path.sep + cmd_list[0]
 
-    command = atom.project.path + path.sep + 'linter-javac'
+    command = atom.project.rootDirectories[0].path + path.sep + 'linter-javac'
 
     if test '-e', command
       cmd_list[0] = command
@@ -62,52 +65,59 @@ class LinterJavac extends Linter
     }
 
   processLines: (message) ->
-    file = @editor.buffer.file.path
     messages = []
+    return messages if !message.length
+
+    file = @editor.buffer.file.path
     split = message.split("\n")
 
     match = null
 
     for m in split
-      continue if m.substring(0,1) is " "
-      match = null
+      if m.substring(0,1) is " "
+        continue if !match
+        match.message += ", " + m.trim()
+      else
+        if match
+          try
+            range = @computeRange match
+          catch error
+            console.log error
+            range = new Range(
+              [0, 0],
+              [0, 0]
+            )
 
-      l = m.split(/:\s?/)
-      continue if l.length < 4
+          item =
+            line: match.line
+            level: match.type
+            message: match.message
+            linter: @linterName
+            range: range
 
-      filename = l[0]
-      continue if filename isnt file
-      line = l[1]
-      type = l[2]
-      msg = l[3]
-      info = l[4]
+          messages.push item
 
-      match =
-        filename: filename
-        line: line
-        type: type
-        message: msg
-        info: info
+        match = null
 
-      msg += ': ' + info if info
+        l = m.split(/:\s?/)
+        continue if l.length < 4
 
-      try
-        range = @computeRange match
-      catch error
-        console.log error
-        range = new Range(
-          [0, 0],
-          [0, 0]
-        )
+        filename = l[0]
+        #continue if filename isnt file
+        continue if filename isnt @filePath
+        line = l[1]
+        type = l[2]
+        msg = l[3]
+        info = l[4]
 
-      item =
-        line: line
-        level: type
-        message: msg
-        linter: @linterName
-        range: range
+        match =
+          filename: filename
+          line: line
+          type: type
+          message: msg
+          info: info
 
-      messages.push item
+        match.message += ': ' + info if info
     messages
 
   processMessage: (message, callback) ->
