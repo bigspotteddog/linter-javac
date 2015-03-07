@@ -4,10 +4,21 @@ This package will lint your `.java` opened files in Atom through [javac](http://
 
 ## Installation
 
+### Install Java
 * Install [java](http://www.java.com/).
-* `$ apm install linter` (if you don't have [AtomLinter/Linter](https://github.com/AtomLinter/Linter) installed).
-* `$ apm install linter-javac`
 
+### Install Linter
+    $ apm install linter #(if you don't have [AtomLinter/Linter](https://github.com/AtomLinter/Linter) installed).
+ 
+### Install Linter Javac (apm)
+
+    $ apm install linter-javac
+
+### Install Linter Javac (git)
+    $ cd ~/.atom/packages
+    $ git clone <this repository>
+    $ npm install
+    
 ## Settings
 You can configure linter-javac by editing ~/.atom/config.cson (choose Open Your Config in Atom menu):
 
