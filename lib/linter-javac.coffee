@@ -112,6 +112,7 @@ class LinterJavac extends Linter
 
         match =
           filename: filename
+          colStart: 0
           line: line
           type: type
           message: msg
