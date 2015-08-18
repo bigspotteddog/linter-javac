@@ -31,7 +31,7 @@ There are other linters available - take a look at the linters [mainpage](https:
 ## Shell Script Example
 Below is an example script for project based java linting.
 
-    !/bin/bash
+    #!/bin/bash
 
     DIR="$( cd "$( dirname "$0" )" && pwd )"
 
